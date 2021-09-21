@@ -1,4 +1,4 @@
-> 🚒 Add custom auth flow to all queries and mutations!
+> 🚒 Add workspaces based auth flow to all queries and mutations!
 
 # graphql-workspace-authorizer-transformer
 
@@ -20,7 +20,7 @@ Edit `amplify/backend/api/<YOUR_API>/transform.conf.json` and append `"graphql-w
 
 ### Use @workspaceAuth directive
 
-Append `@workspaceAuth` to target types and add the name of the separately deployed function that should be called for every mutation and query to this type as argument.
+Append `@workspaceAuth` to target types and add the params.
 
 ```graphql
 type Todo @model @workspaceAuth(ownershipModelName:"Ownership", userField:"userID", indexName:"byUser", roleField:"role", allowedRoles:["Editor", "Admin", "Owner"], relatedWorkspaceIDField:"companyID") {

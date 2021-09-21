@@ -14,8 +14,11 @@ import {
   compoundExpression,
   qref,
   raw,
+  and,
   iff,
   int,
+  not,
+  or,
   forEach,
   bool,
   ifElse,
@@ -38,7 +41,7 @@ const DYNAMODB_METADATA_KEY = "DynamoDBTransformerMetadata";
 export class WorkspaceAuthorizerTransformer extends Transformer {
   constructor() {
     super(
-      "CompanyOwnershipTransformer",
+      "WorkspaceAuthorizerTransformer",
       gql`
         directive @workspaceAuth(dataSourceName: String, userField: String, indexName: String, roleField: String, allowedRoles: [String]) on OBJECT
       `
@@ -206,9 +209,9 @@ export class WorkspaceAuthorizerTransformer extends Transformer {
            ),
            ResponseMappingTemplate:print(
              compoundExpression([
-               iff(str("$ctx.error"),str("$util.error($ctx.error.message, $ctx.error.type)")),
-               iff(str(`$ctx.result.items and ($ctx.result.items.isEmpty() or !$ctx.stash.allowedRoles.contains($ctx.result.items[0].${roleField}))`),str('$util.unauthorized()')),
-               str("$util.toJson($ctx.prev.result)"),
+               iff(ref('ctx.error'),ref('util.error($ctx.error.message, $ctx.error.type)')),
+               iff(and([ref('ctx.result.items'), or([ref('ctx.result.items.isEmpty()'), not(ref(`ctx.stash.allowedRoles.contains($ctx.result.items[0].${roleField})`))])]),ref('util.unauthorized()')),
+               ref("util.toJson($ctx.prev.result)"),
              ])
            ),
          })
@@ -232,11 +235,11 @@ export class WorkspaceAuthorizerTransformer extends Transformer {
         print(
           compoundExpression([
             iff(
-              str(`!$util.isNull($ctx.result) and !$util.isNull($ctx.result.${relatedWorkspaceIDField})`),
+              and([not(ref(`util.isNull($ctx.result)`)), not(ref(`util.isNull($ctx.result.${relatedWorkspaceIDField})`))]),
               qref(`$ctx.stash.put("workspaceID", $ctx.result.${relatedWorkspaceIDField})`)
             ),
             iff(
-              str(`!$util.isNull($ctx.result) and !$util.isNullOrEmpty($ctx.result.items) and !$util.isNull($ctx.result.items[0].${relatedWorkspaceIDField})`),
+              and([not(ref(`util.isNull($ctx.result)`)), not(ref(`util.isNullOrEmpty($ctx.result.items)`)), not(ref(`util.isNull($ctx.result.items[0].${relatedWorkspaceIDField})`))]),
               compoundExpression([
                 qref(`$ctx.stash.put("workspaceID", $ctx.result.items[0].${relatedWorkspaceIDField})`),
                 forEach(
@@ -244,14 +247,14 @@ export class WorkspaceAuthorizerTransformer extends Transformer {
                   ref('context.result.items'), 
                   [
                     iff(
-                      str(`$ctx.stash.workspaceID != $item.${relatedWorkspaceIDField}`),
-                      str('$util.unauthorized()')
+                      ref(`ctx.stash.workspaceID != $item.${relatedWorkspaceIDField}`),
+                      ref('util.unauthorized()')
                     )
                   ]
                 ),
               ])
             ),
-            str(originalResolver.Properties.ResponseMappingTemplate),
+            originalResolver.Properties.ResponseMappingTemplate,
           ])
         ),
       })
