@@ -43,7 +43,7 @@ export class WorkspaceAuthorizerTransformer extends Transformer {
     super(
       "WorkspaceAuthorizerTransformer",
       gql`
-        directive @workspaceAuth(dataSourceName: String, userField: String, indexName: String, roleField: String, allowedRoles: [String]) on OBJECT
+        directive @workspaceAuth(ownershipModelName: String, userField: String, indexName: String, roleField: String, allowedRoles: [String], relatedWorkspaceIDField: String) on OBJECT
       `
     );
   }
@@ -343,11 +343,11 @@ export class WorkspaceAuthorizerTransformer extends Transformer {
         RequestMappingTemplate: printBlock("Stash resolver specific context.")(
           compoundExpression([
             iff(
-              str(`!$util.isNull($ctx.args.input) and !$util.isNull($ctx.args.input.${relatedWorkspaceIDField})`),
+              and([not(ref(`util.isNull($ctx.args.input)`)),  not(ref(`util.isNull($ctx.args.input.${relatedWorkspaceIDField})`))]),
               qref(`$ctx.stash.put("workspaceID", $ctx.args.input.${relatedWorkspaceIDField})`)
             ),
             iff(
-              str(`!$util.isNull($ctx.args.input) and !$util.isNull($ctx.args.input.id)`),
+              and([not(ref(`!$util.isNull($ctx.args.input)`)), not(ref(`util.isNull($ctx.args.input.id)`))]),
               qref(`$ctx.args.put("id", $ctx.args.input.id)`)
             ),
             qref(`$ctx.stash.put("typeName", "${typeName}")`),
