@@ -4,6 +4,7 @@
     "module": "commonjs",
     "lib": ["es2018"],
     "declaration": true,
+    "esModuleInterop": true,
     "sourceMap": true,
     "outDir": "./dist",
     "noImplicitAny": true,

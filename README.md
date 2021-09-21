@@ -1,4 +1,4 @@
-> 🚒 Add a simple interceptor to all of your Amplify API mutations and queries!
+> 🚒 Add custom auth flow to all queries and mutations!
 
 # graphql-workspace-authorizer-transformer
 
@@ -23,52 +23,12 @@ Edit `amplify/backend/api/<YOUR_API>/transform.conf.json` and append `"graphql-w
 Append `@workspace` to target types and add the name of the separately deployed function that should be called for every mutation and query to this type as argument.
 
 ```graphql
-type Todo @model @workspaceAuth(dataSourceName: "auditlog-${env}", userField: "owner", indexName: "byUser", roleField: "owner", allowedRoles: ["Editor", "Admin", "Owner"]) {
+type Todo @model @workspaceAuth(ownershipModelName:"Ownership", userField:"userID", indexName:"byUser", roleField:"role", allowedRoles:["Editor", "Admin", "Owner"], relatedWorkspaceIDField:"companyID") {
   id: ID!
   title: String!
   description: String
 }
 ```
-
-In this example, the `auditlog-${env}` lambda will be called before every mutation or query to the `Todo` type, which is ideal to build an audit logger for example.
-
-**If you deployed your function using the 'amplify function' category**
-
-The Amplify CLI provides support for maintaining multiple environments out of the box. When you deploy a function via `amplify add function`, it will automatically add the environment suffix to your Lambda function name. For example if you create a function named **auditlog** using `amplify add function` in the **dev** environment, the deployed function will be named **auditlog-dev**. The `@firehose` directive allows you to use `${env}` to reference the current Amplify CLI environment.
-
-```graphql
-type Todo @model @workspaceAuth(name: "auditlog-${env}") {
-  id: ID!
-  title: String!
-  description: String
-}
-```
-
-**If you deployed your function without amplify**
-
-If you deployed your API without amplify then you must provide the full Lambda function name. If you deployed the same function with the name **auditlog** then you would have:
-
-```graphql
-type Todo @model @workspaceAuth(name: "auditlog") {
-  id: ID!
-  title: String!
-  description: String
-}
-```
-
-#### Calling functions in different regions
-
-By default, you expect the function to be in the same region as the amplify project. If you need to call a function in a different (or static) region, you can provide the **region** argument.
-
-```graphql
-type Todo @model @workspaceAuth(name: "auditlog", region: "us-east-1") {
-  id: ID!
-  title: String!
-  description: String
-}
-```
-
-Calling functions in different AWS accounts is not supported via the @firehose directive but is supported by AWS AppSync.
 
 #### Structure of the function event
 
