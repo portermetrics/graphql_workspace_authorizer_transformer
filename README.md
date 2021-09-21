@@ -18,7 +18,7 @@ Edit `amplify/backend/api/<YOUR_API>/transform.conf.json` and append `"graphql-w
 ]
 ```
 
-### Use @workspace directive
+### Use @workspaceAuth directive
 
 Append `@workspace` to target types and add the name of the separately deployed function that should be called for every mutation and query to this type as argument.
 
@@ -32,7 +32,7 @@ type Todo @model @workspaceAuth(ownershipModelName:"Ownership", userField:"userI
 
 #### Structure of the function event
 
-When writing lambda functions that are connected via the `@workspace` directive, you can expect the following structure for the AWS Lambda event object.
+When writing lambda functions that are connected via the `@workspaceAuth` directive, you can expect the following structure for the AWS Lambda event object.
 
 | Key       | Description                                                                                                                                                            |
 | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
