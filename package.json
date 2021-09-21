@@ -19,12 +19,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/portermetrics/graphql-workspace-authorizer-transformer.git"
+    "url": "git+https://github.com/portermetrics/graphql_workspace_authorizer_transformer.git"
   },
   "bugs": {
-    "url": "https://github.com/portermetrics/graphql-workspace-authorizer-transformer/issues"
+    "url": "https://github.com/portermetrics/graphql_workspace_authorizer_transformer/issues"
   },
-  "homepage": "https://github.com/portermetrics/graphql-workspace-authorizer-transformer#readme",
+  "homepage": "https://github.com/portermetrics/graphql_workspace_authorizer_transformer#readme",
   "keywords": [
     "aws",
     "amplify",
