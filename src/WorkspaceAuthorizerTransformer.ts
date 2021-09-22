@@ -217,7 +217,6 @@ export class WorkspaceAuthorizerTransformer extends Transformer {
          })
        );
        ctx.mapResourceToStack(WORKSPACE_AUTHORIZER_DIRECTIVE_STACK, authorizationpipelineFunctionId);
-
     // build a pipeline function and copy the original data source and mapping templates
     const pipelineFunctionId = `${typeName}${fieldNameFirstletterUppercase}Function`;
     ctx.setResource(
@@ -254,7 +253,7 @@ export class WorkspaceAuthorizerTransformer extends Transformer {
                 ),
               ])
             ),
-            originalResolver.Properties.ResponseMappingTemplate,
+            obj(originalResolver.Properties.ResponseMappingTemplate),
           ])
         ),
       })

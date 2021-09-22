@@ -2,6 +2,27 @@ import { GraphQLTransform } from "graphql-transformer-core";
 import { DynamoDBModelTransformer } from "graphql-dynamodb-transformer";
 import WorkspaceAuthorizerTransformer from "../index";
 
+import {
+  obj,
+  str,
+  ref,
+  printBlock,
+  print,
+  compoundExpression,
+  qref,
+  raw,
+  and,
+  iff,
+  int,
+  not,
+  or,
+  forEach,
+  bool,
+  ifElse,
+  nul,
+  DynamoDBMappingTemplate,
+} from "graphql-mapping-template";
+
 // @ts-ignore
 import { AppSyncTransformer } from "graphql-appsync-transformer";
 
@@ -15,17 +36,6 @@ const transformer = new GraphQLTransform({
     new DynamoDBModelTransformer(),
     new WorkspaceAuthorizerTransformer(),
   ],
-});
-
-test("@workspaceAuth directive can be used on types", () => {
-  const schema = `
-    type Todo @model @workspaceAuth {
-      id: ID!
-      title: String!
-      description: String
-    }
-  `;
-  expect(() => transformer.transform(schema)).not.toThrow();
 });
 
 test("@workspaceAuth directive can not be used on fields", () => {
@@ -62,5 +72,35 @@ test("Transformer can be executed without errors", () => {
         description: String
     }
   `;
-  transformer.transform(schema);
+  expect(() => transformer.transform(schema)).not.toThrow();
+});
+
+test("Transformer can be executed without errors", () => {
+  let result = print(
+    compoundExpression([
+      iff(
+        and([not(ref(`util.isNull($ctx.result)`)), not(ref(`util.isNull($ctx.result.asdf)`))]),
+        qref(`$ctx.stash.put("workspaceID", $ctx.result.asdf)`)
+      ),
+      iff(
+        and([not(ref(`util.isNull($ctx.result)`)), not(ref(`util.isNullOrEmpty($ctx.result.items)`)), not(ref(`util.isNull($ctx.result.items[0].asdf)`))]),
+        compoundExpression([
+          qref(`$ctx.stash.put("workspaceID", $ctx.result.items[0].asdfas)`),
+          forEach(
+            ref('item'), 
+            ref('context.result.items'), 
+            [
+              iff(
+                ref(`ctx.stash.workspaceID != $item.asdfs`),
+                ref('util.unauthorized()')
+              )
+            ]
+          ),
+        ])
+      ),
+      obj({prueba:str("sdfsdf")}),
+    ])
+  )
+
+  console.log(result)
 });
