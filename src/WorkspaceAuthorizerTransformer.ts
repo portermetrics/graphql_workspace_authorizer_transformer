@@ -56,7 +56,7 @@ export class WorkspaceAuthorizerTransformer extends Transformer {
   ) => {
     this.validateObject(definition);
 
-    const { ownershipModelName="Ownership", userField="userID", indexName="byUser", roleField="role", allowedRoles=["Editor", "Admin", "Owner"], relatedWorkspaceIDField="companyID" } = getDirectiveArguments(directive);
+    const { ownershipModelName="Ownership", userField="userID", indexName="byUser", roleField="role", allowedRoles=["editor", "admin", "owner"], relatedWorkspaceIDField="companyID" } = getDirectiveArguments(directive);
 
     
     this.createWorkspaceAuthorizerResolver(
@@ -211,7 +211,7 @@ export class WorkspaceAuthorizerTransformer extends Transformer {
            ResponseMappingTemplate:print(
              compoundExpression([
                iff(ref('ctx.error'),ref('util.error($ctx.error.message, $ctx.error.type)')),
-               iff(and([not(isNullOrEmpty(ref('ctx.result.items'))), not(ref('ctx.result.items.isEmpty()')), not(ref(`ctx.stash.allowedRoles.contains(($utils.toJson($ctx.result.items)[0].${roleField})`))]),ref('util.unauthorized()')),
+               iff(or([isNullOrEmpty(ref('ctx.result.items')), ref('ctx.result.items.isEmpty()'), not(ref(`ctx.stash.allowedRoles.contains($ctx.result.items[0].${roleField})`))]),ref('util.unauthorized()')),
                ref("util.toJson($ctx.prev.result)"),
              ])
            ),
@@ -239,9 +239,9 @@ export class WorkspaceAuthorizerTransformer extends Transformer {
               qref(`$ctx.stash.put("workspaceID", $ctx.result.${relatedWorkspaceIDField})`)
             ),
             iff(
-              and([not(ref(`util.isNull($ctx.result)`)), not(ref(`util.isNullOrEmpty($ctx.result.items)`)), not(ref(`util.isNull($utils.toJson($ctx.result.items)[0].${relatedWorkspaceIDField})`))]),
+              and([not(ref(`util.isNull($ctx.result)`)), not(ref(`util.isNullOrEmpty($ctx.result.items)`)), not(ref(`ctx.result.items.isEmpty()`))]),
               compoundExpression([
-                qref(`$ctx.stash.put("workspaceID", $utils.toJson($ctx.result.items)[0].${relatedWorkspaceIDField})`),
+                qref(`$ctx.stash.put("workspaceID", $ctx.result.items[0].${relatedWorkspaceIDField})`),
                 forEach(
                   ref('item'), 
                   ref('context.result.items'), 
@@ -347,7 +347,7 @@ export class WorkspaceAuthorizerTransformer extends Transformer {
               qref(`$ctx.stash.put("workspaceID", $ctx.args.input.${relatedWorkspaceIDField})`)
             ),
             iff(
-              and([not(ref(`!$util.isNull($ctx.args.input)`)), not(ref(`util.isNull($ctx.args.input.id)`))]),
+              and([not(ref(`util.isNull($ctx.args.input)`)), not(ref(`util.isNull($ctx.args.input.id)`))]),
               qref(`$ctx.args.put("id", $ctx.args.input.id)`)
             ),
             qref(`$ctx.stash.put("typeName", "${typeName}")`),
