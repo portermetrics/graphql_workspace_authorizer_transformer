@@ -22,6 +22,7 @@ import {
   forEach,
   bool,
   ifElse,
+  isNullOrEmpty,
   nul,
   DynamoDBMappingTemplate,
 } from "graphql-mapping-template";
@@ -210,7 +211,7 @@ export class WorkspaceAuthorizerTransformer extends Transformer {
            ResponseMappingTemplate:print(
              compoundExpression([
                iff(ref('ctx.error'),ref('util.error($ctx.error.message, $ctx.error.type)')),
-               iff(and([ref('ctx.result.items'), or([ref('ctx.result.items.isEmpty()'), not(ref(`ctx.stash.allowedRoles.contains($ctx.result.items[0].${roleField})`))])]),ref('util.unauthorized()')),
+               iff(and([not(isNullOrEmpty(ref('ctx.result.items'))), not(ref('ctx.result.items.isEmpty()')), not(ref(`ctx.stash.allowedRoles.contains(($utils.toJson($ctx.result.items)[0].${roleField})`))]),ref('util.unauthorized()')),
                ref("util.toJson($ctx.prev.result)"),
              ])
            ),
@@ -238,9 +239,9 @@ export class WorkspaceAuthorizerTransformer extends Transformer {
               qref(`$ctx.stash.put("workspaceID", $ctx.result.${relatedWorkspaceIDField})`)
             ),
             iff(
-              and([not(ref(`util.isNull($ctx.result)`)), not(ref(`util.isNullOrEmpty($ctx.result.items)`)), not(ref(`util.isNull($ctx.result.items[0].${relatedWorkspaceIDField})`))]),
+              and([not(ref(`util.isNull($ctx.result)`)), not(ref(`util.isNullOrEmpty($ctx.result.items)`)), not(ref(`util.isNull($utils.toJson($ctx.result.items)[0].${relatedWorkspaceIDField})`))]),
               compoundExpression([
-                qref(`$ctx.stash.put("workspaceID", $ctx.result.items[0].${relatedWorkspaceIDField})`),
+                qref(`$ctx.stash.put("workspaceID", $utils.toJson($ctx.result.items)[0].${relatedWorkspaceIDField})`),
                 forEach(
                   ref('item'), 
                   ref('context.result.items'), 
@@ -253,7 +254,7 @@ export class WorkspaceAuthorizerTransformer extends Transformer {
                 ),
               ])
             ),
-            obj(originalResolver.Properties.ResponseMappingTemplate),
+            raw(originalResolver.Properties.ResponseMappingTemplate),
           ])
         ),
       })

@@ -75,32 +75,32 @@ test("Transformer can be executed without errors", () => {
   expect(() => transformer.transform(schema)).not.toThrow();
 });
 
-test("Transformer can be executed without errors", () => {
-  let result = print(
-    compoundExpression([
-      iff(
-        and([not(ref(`util.isNull($ctx.result)`)), not(ref(`util.isNull($ctx.result.asdf)`))]),
-        qref(`$ctx.stash.put("workspaceID", $ctx.result.asdf)`)
-      ),
-      iff(
-        and([not(ref(`util.isNull($ctx.result)`)), not(ref(`util.isNullOrEmpty($ctx.result.items)`)), not(ref(`util.isNull($ctx.result.items[0].asdf)`))]),
-        compoundExpression([
-          qref(`$ctx.stash.put("workspaceID", $ctx.result.items[0].asdfas)`),
-          forEach(
-            ref('item'), 
-            ref('context.result.items'), 
-            [
-              iff(
-                ref(`ctx.stash.workspaceID != $item.asdfs`),
-                ref('util.unauthorized()')
-              )
-            ]
-          ),
-        ])
-      ),
-      obj({prueba:str("sdfsdf")}),
-    ])
-  )
+// test("Transformer can be executed without errors", () => {
+//   let result = print(
+//     compoundExpression([
+//       iff(
+//         and([not(ref(`util.isNull($ctx.result)`)), not(ref(`util.isNull($ctx.result.asdf)`))]),
+//         qref(`$ctx.stash.put("workspaceID", $ctx.result.asdf)`)
+//       ),
+//       iff(
+//         and([not(ref(`util.isNull($ctx.result)`)), not(ref(`util.isNullOrEmpty($ctx.result.items)`)), not(ref(`util.isNull($ctx.result.items[0].asdf)`))]),
+//         compoundExpression([
+//           qref(`$ctx.stash.put("workspaceID", $ctx.result.items[0].asdfas)`),
+//           forEach(
+//             ref('item'), 
+//             ref('context.result.items'), 
+//             [
+//               iff(
+//                 ref(`ctx.stash.workspaceID != $item.asdfs`),
+//                 ref('util.unauthorized()')
+//               )
+//             ]
+//           ),
+//         ])
+//       ),
+//       obj({prueba:str("sdfsdf")}),
+//     ])
+//   )
 
-  console.log(result)
-});
+//   console.log(result)
+// });
