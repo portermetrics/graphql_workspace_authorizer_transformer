@@ -211,7 +211,7 @@ export class WorkspaceAuthorizerTransformer extends Transformer {
            ResponseMappingTemplate:print(
              compoundExpression([
                iff(ref('ctx.error'),ref('util.error($ctx.error.message, $ctx.error.type)')),
-               iff(or([isNullOrEmpty(ref('ctx.result.items')), ref('ctx.result.items.isEmpty()'), not(ref(`ctx.stash.allowedRoles.contains($ctx.result.items[0].${roleField})`))]),ref('util.unauthorized()')),
+               iff(and([not(ref('util.isNull($ctx.stash.workspaceID')),or([isNullOrEmpty(ref('ctx.result.items')), ref('ctx.result.items.isEmpty()'), not(ref(`ctx.stash.allowedRoles.contains($ctx.result.items[0].${roleField})`))])]),ref('util.unauthorized()')),
                ref("util.toJson($ctx.prev.result)"),
              ])
            ),
