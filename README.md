@@ -2,6 +2,15 @@
 
 # graphql-workspace-authorizer-transformer
 
+##Local instalation, run this command located in the project where you want to install this module
+
+`npm install /path/to/root/graph-workdpace-authorizer`
+
+##Build
+
+`npm run-script build`
+
+
 ## Installation
 
 `npm install --save graphql-workspace-authorizer-transformer`
